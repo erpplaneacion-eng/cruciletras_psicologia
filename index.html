@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sopa de letras · Corporación Hacia un Valle Solidario</title>
+  <meta name="description" content="Tu mente tiene un reto. Tu bienestar, un mensaje para ti. Sopa de letras del programa de bienestar de la Corporación Hacia un Valle Solidario.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Misma paleta y tipografía de citas_psicologia (citas/static/citas/css/app.css). */
+    :root {
+      --marfil: #F4F1E8;
+      --marfil-claro: #FBFAF6;
+      --verde: #2D7A4F;
+      --verde-hondo: #1E5637;
+      --verde-claro: #6FA98A;
+      --salvia: #A8C3B0;
+      --tinta: #22301F;
+      --tinta-suave: #5A6B5E;
+      --tenue: #8A8577;
+      --borde: rgba(34, 48, 31, .12);
+      --vidrio: rgba(251, 250, 246, .62);
+      --vidrio-borde: rgba(255, 255, 255, .78);
+      --sombra: 0 30px 80px -24px rgba(34, 48, 31, .32);
+      --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background:
+        radial-gradient(60vmax 60vmax at 12% 8%, rgba(168, 195, 176, .35), transparent 60%),
+        radial-gradient(50vmax 50vmax at 92% 96%, rgba(111, 169, 138, .22), transparent 60%),
+        var(--marfil);
+      color: var(--tinta);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .pagina {
+      width: min(960px, 100%);
+      margin: 0 auto;
+      padding: clamp(28px, 6vw, 64px) 16px 48px;
+    }
+
+    .encabezado { text-align: center; margin-bottom: 30px; }
+
+    .encabezado__sello {
+      margin: 0 0 14px;
+      font-size: 10px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--verde);
+    }
+
+    .encabezado h1 {
+      margin: 0 0 6px;
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: clamp(36px, 7vw, 62px);
+      line-height: 1.08;
+      letter-spacing: -.01em;
+    }
+
+    .encabezado__sub {
+      margin: 0 0 18px;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(20px, 3.4vw, 28px);
+      color: var(--verde-hondo);
+    }
+
+    .encabezado__texto {
+      margin: 0 auto;
+      max-width: 52ch;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--tinta-suave);
+    }
+
+    .indicacion {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px auto 0;
+      max-width: 560px;
+      padding: 12px 20px;
+      border: 1px solid rgba(45, 122, 79, .3);
+      border-radius: 999px;
+      background: rgba(168, 195, 176, .22);
+      font-size: 13.5px;
+      font-weight: 600;
+      line-height: 1.6;
+      color: var(--verde-hondo);
+      text-align: left;
+    }
+
+    .indicacion span { font-size: 20px; }
+
+    .vidrio {
+      padding: clamp(18px, 3.5vw, 36px);
+      border-radius: 28px;
+      border: 1px solid var(--vidrio-borde);
+      background: var(--vidrio);
+      backdrop-filter: blur(22px) saturate(150%);
+      -webkit-backdrop-filter: blur(22px) saturate(150%);
+      box-shadow: var(--sombra);
+    }
+
+    .juego {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: clamp(18px, 3vw, 34px);
+      align-items: start;
+    }
+
+    /* ------------------------------------------------------------ tablero */
+
+    .tablero {
+      display: grid;
+      grid-template-columns: repeat(var(--n), 1fr);
+      gap: 3px;
+      width: 100%;
+      max-width: 560px;
+      margin: 0 auto;
+      touch-action: none;  /* arrastrar no hace scroll en el celular */
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .letra {
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .42);
+      color: var(--tinta);
+      font-family: var(--sans);
+      font-size: clamp(13px, 3.4vw, 19px);
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 220ms ease, color 220ms ease, border-color 220ms ease, transform 220ms ease;
+    }
+
+    .letra:hover { border-color: rgba(45, 122, 79, .35); }
+    .letra:focus-visible { outline: 2px solid var(--verde); outline-offset: 1px; }
+
+    .letra.encontrada { background: rgba(168, 195, 176, .55); color: var(--verde-hondo); font-weight: 600; }
+
+    .letra.marcada {
+      background: var(--verde);
+      border-color: var(--verde);
+      color: var(--marfil-claro);
+      transform: scale(1.06);
+    }
+
+    .letra.error { animation: sacudir 380ms ease; }
+
+    @keyframes sacudir {
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
+    }
+
+    /* ------------------------------------------------------------ palabras */
+
+    .palabras__titulo {
+      margin: 0 0 4px;
+      font-family: var(--serif);
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .palabras__cuenta { margin: 0 0 16px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--tenue); }
+
+    .palabras ul {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .palabras li {
+      padding: 10px 14px;
+      border: 1px solid rgba(45, 122, 79, .22);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .4);
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: .14em;
+      color: var(--verde-hondo);
+      transition: background 400ms ease, color 400ms ease, border-color 400ms ease;
+    }
+
+    .palabras li.hecha {
+      background: rgba(168, 195, 176, .3);
+      border-color: transparent;
+      color: var(--tenue);
+      text-decoration: line-through;
+    }
+
+    .palabras li.hecha::after { content: " ✓"; color: var(--verde); text-decoration: none; display: inline-block; margin-left: 4px; }
+
+    .atajo {
+      display: inline-block;
+      margin-top: 22px;
+      font-size: 12px;
+      color: var(--tenue);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .atajo:hover { color: var(--verde-hondo); }
+
+    /* ------------------------------------------------------------ mensaje final */
+
+    .final {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(244, 241, 232, .55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 420ms ease;
+    }
+
+    .final.visible { opacity: 1; pointer-events: auto; }
+
+    .final .vidrio {
+      position: relative;
+      width: min(620px, 100%);
+      max-height: calc(100dvh - 32px);
+      overflow-y: auto;
+      text-align: center;
+      background: rgba(251, 250, 246, .9);
+      transform: translateY(22px) scale(.985);
+      transition: transform 520ms cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .final.visible .vidrio { transform: none; }
+
+    .final__marca {
+      width: 70px;
+      height: 70px;
+      margin: 6px auto 22px;
+      border-radius: 50%;
+      border: 1px solid rgba(45, 122, 79, .35);
+      background: rgba(168, 195, 176, .22);
+      display: grid;
+      place-items: center;
+      color: var(--verde);
+      font-size: 28px;
+      animation: respirar 7s ease-in-out infinite;
+    }
+
+    @keyframes respirar {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(45, 122, 79, .18); }
+      50%      { box-shadow: 0 0 0 16px rgba(45, 122, 79, 0); }
+    }
+
+    .final h2 {
+      margin: 0 0 16px;
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: clamp(28px, 5vw, 38px);
+      line-height: 1.15;
+    }
+
+    .final p { margin: 0 auto 14px; max-width: 48ch; font-size: 15px; line-height: 1.8; color: var(--tinta-suave); }
+
+    .final__cierre { font-family: var(--serif); font-style: italic; font-size: 21px !important; color: var(--verde-hondo) !important; }
+
+    .boton {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 10px 0 18px;
+      padding: 16px 28px;
+      border: 1px solid var(--verde);
+      border-radius: 999px;
+      background: var(--verde);
+      color: var(--marfil-claro);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      line-height: 1.5;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 300ms ease, transform 300ms ease, box-shadow 300ms ease;
+    }
+
+    .boton:hover {
+      background: var(--verde-hondo);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 34px -16px rgba(30, 86, 55, .8);
+    }
+
+    .cerrar {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--borde);
+      background: rgba(255, 255, 255, .5);
+      color: var(--tinta-suave);
+      font-size: 17px;
+      cursor: pointer;
+      transition: background 300ms ease, transform 300ms ease;
+    }
+
+    .cerrar:hover { background: #fff; transform: rotate(90deg); }
+
+    .pie { margin-top: 26px; text-align: center; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--tenue); }
+
+    @media (max-width: 760px) {
+      .juego { grid-template-columns: 1fr; }
+      .palabras ul { grid-template-columns: repeat(2, 1fr); }
+      .palabras li { text-align: center; padding: 9px 8px; letter-spacing: .08em; }
+      .letra { border-radius: 7px; }
+      .tablero { gap: 2px; }
+      .vidrio { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: rgba(251, 250, 246, .88); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="pagina">
+    <header class="encabezado">
+      <p class="encabezado__sello">Corporación Hacia un Valle Solidario</p>
+      <h1>Tu mente tiene un reto.</h1>
+      <p class="encabezado__sub">Tu bienestar, un mensaje para ti.</p>
+      <p class="encabezado__texto">
+        Busca las 8 palabras escondidas en la sopa de letras, pueden estar en horizontal, vertical
+        o diagonal. ¡Haz una pausa y acepta el reto!
+      </p>
+      <p class="indicacion">
+        <span aria-hidden="true">👆</span>
+        Para marcar una palabra, mantén presionado el mouse o tu dedo sobre la primera letra
+        y arrástralo hasta la última.
+      </p>
+    </header>
+
+    <section class="vidrio juego">
+      <div class="tablero" id="tablero" role="grid" aria-label="Sopa de letras. Toca la primera y la última letra de cada palabra."></div>
+
+      <aside class="palabras">
+        <h2 class="palabras__titulo">Palabras</h2>
+        <p class="palabras__cuenta" id="cuenta" aria-live="polite">0 de 8</p>
+        <ul id="lista"></ul>
+        <a class="atajo" href="#" id="ver-mensaje">Prefiero ir directo al mensaje</a>
+      </aside>
+    </section>
+
+    <p class="pie">También puedes tocar la primera letra y luego la última</p>
+  </main>
+
+  <div class="final" id="final" aria-hidden="true">
+    <div class="vidrio" role="dialog" aria-modal="true" aria-labelledby="final-titulo">
+      <button type="button" class="cerrar" id="cerrar" aria-label="Cerrar">&#10005;</button>
+      <div class="final__marca">&#10003;</div>
+      <h2 id="final-titulo">¿Encontraste alguna palabra que necesitabas?</h2>
+      <p>
+        A veces, una palabra nos recuerda algo que necesitamos: hacer una pausa, poner un límite,
+        hablar de lo que sentimos o simplemente ser escuchados.
+      </p>
+      <p>
+        En CHVS contamos con un espacio para escucharte, acompañarte y ayudarte a encontrar nuevas
+        maneras de afrontar lo que estás viviendo.
+      </p>
+      <a class="boton" href="https://web-production-0552d9.up.railway.app/">
+        Agenda tu cita psicológica haciendo clic aquí
+      </a>
+      <p class="final__cierre">Tu bienestar también merece un espacio.</p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      // texto = como se muestra; clave = como va en la sopa (sin tildes).
+      const PALABRAS = ["AYUDA", "LÍMITES", "ESCUCHA", "PAUSA", "HABLAR", "CALMA", "APOYO", "BIENESTAR"];
+      const N = 12;
+      // Solo hacia adelante (→ ↓ ↘ ↗): la instrucción no promete palabras al revés.
+      const DIRECCIONES = [[0, 1], [1, 0], [1, 1], [-1, 1]];
+      const LETRAS = "ABCDEFGHIJKLMNOPRSTUVYZ";
+
+      const clave = (t) => t.normalize("NFD").replace(/[̀-ͯ]/g, "");
+      const azar = (n) => Math.floor(Math.random() * n);
+
+      function generar() {
+        // ponytail: colocación al azar con reintentos; con 8 palabras en 12×12 nunca pasa del primer intento.
+        for (let intento = 0; intento < 200; intento++) {
+          const rejilla = Array.from({ length: N }, () => Array(N).fill(""));
+          const ubicadas = {};
+          const ordenadas = [...PALABRAS].sort((a, b) => b.length - a.length);
+          let ok = true;
+
+          for (const texto of ordenadas) {
+            const p = clave(texto);
+            let puesta = false;
+            for (let t = 0; t < 400 && !puesta; t++) {
+              const [df, dc] = DIRECCIONES[azar(DIRECCIONES.length)];
+              const f = azar(N), c = azar(N);
+              const ff = f + df * (p.length - 1), fc = c + dc * (p.length - 1);
+              if (ff < 0 || ff >= N || fc >= N) continue;
+              let cabe = true;
+              for (let i = 0; i < p.length && cabe; i++) {
+                const actual = rejilla[f + df * i][c + dc * i];
+                cabe = actual === "" || actual === p[i];
+              }
+              if (!cabe) continue;
+              for (let i = 0; i < p.length; i++) rejilla[f + df * i][c + dc * i] = p[i];
+              ubicadas[p] = { f, c, df, dc };
+              puesta = true;
+            }
+            if (!puesta) { ok = false; break; }
+          }
+
+          if (!ok) continue;
+          for (const fila of rejilla) for (let c = 0; c < N; c++) if (!fila[c]) fila[c] = LETRAS[azar(LETRAS.length)];
+
+          // Autochequeo: cada palabra se lee en la rejilla donde se registró.
+          for (const p in ubicadas) {
+            const u = ubicadas[p];
+            let leida = "";
+            for (let i = 0; i < p.length; i++) leida += rejilla[u.f + u.df * i][u.c + u.dc * i];
+            console.assert(leida === p, "Sopa de letras: " + p + " no quedó bien ubicada");
+          }
+          return rejilla;
+        }
+        throw new Error("No se pudo armar la sopa de letras");
+      }
+
+      const rejilla = generar();
+      const tablero = document.getElementById("tablero");
+      const lista = document.getElementById("lista");
+      const cuenta = document.getElementById("cuenta");
+      const final = document.getElementById("final");
+      tablero.style.setProperty("--n", N);
+
+      const celdas = [];
+      rejilla.forEach((fila, f) => fila.forEach((letra, c) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "letra";
+        b.textContent = letra;
+        b.dataset.f = f;
+        b.dataset.c = c;
+        b.setAttribute("aria-label", "Fila " + (f + 1) + ", columna " + (c + 1) + ": " + letra);
+        tablero.appendChild(b);
+        celdas.push(b);
+      }));
+
+      const items = {};
+      PALABRAS.forEach((texto) => {
+        const li = document.createElement("li");
+        li.textContent = texto;
+        lista.appendChild(li);
+        items[clave(texto)] = li;
+      });
+
+      const encontradas = new Set();
+      const celda = (f, c) => celdas[f * N + c];
+
+      // Celdas en línea recta entre dos puntos, o null si no es recta.
+      function linea(a, b) {
+        const df = Math.sign(b.f - a.f), dc = Math.sign(b.c - a.c);
+        const largo = Math.max(Math.abs(b.f - a.f), Math.abs(b.c - a.c));
+        if (b.f - a.f !== df * largo || b.c - a.c !== dc * largo) return null;
+        return Array.from({ length: largo + 1 }, (_, i) => celda(a.f + df * i, a.c + dc * i));
+      }
+
+      const pos = (el) => ({ f: +el.dataset.f, c: +el.dataset.c });
+      let inicio = null;   // celda donde empezó la selección
+      let marcadas = [];
+      let arrastrando = false;
+      let movio = false;
+
+      function marcar(fin) {
+        marcadas.forEach((el) => el.classList.remove("marcada"));
+        marcadas = linea(pos(inicio), pos(fin)) || [inicio];
+        marcadas.forEach((el) => el.classList.add("marcada"));
+      }
+
+      function terminar() {
+        const palabra = marcadas.map((el) => el.textContent).join("");
+        const alReves = [...palabra].reverse().join("");
+        const hallada = [palabra, alReves].find((p) => items[p] && !encontradas.has(p));
+
+        marcadas.forEach((el) => el.classList.remove("marcada"));
+        if (hallada) {
+          encontradas.add(hallada);
+          marcadas.forEach((el) => el.classList.add("encontrada"));
+          items[hallada].classList.add("hecha");
+          cuenta.textContent = encontradas.size + " de " + PALABRAS.length;
+          if (encontradas.size === PALABRAS.length) setTimeout(mostrarFinal, 700);
+        } else if (marcadas.length > 1) {
+          marcadas.forEach((el) => {
+            el.classList.add("error");
+            setTimeout(() => el.classList.remove("error"), 400);
+          });
+        }
+        marcadas = [];
+        inicio = null;
+      }
+
+      // Arrastrar de la primera a la última letra, o tocar una y luego la otra.
+      tablero.addEventListener("pointerdown", (e) => {
+        const el = e.target.closest(".letra");
+        if (!el) return;
+        e.preventDefault();
+        if (inicio && inicio !== el) { marcar(el); terminar(); return; }
+        inicio = el;
+        arrastrando = true;
+        movio = false;
+        marcar(el);
+      });
+
+      tablero.addEventListener("pointermove", (e) => {
+        if (!arrastrando) return;
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        if (!el || !el.classList.contains("letra")) return;
+        if (el !== inicio) movio = true;
+        marcar(el);
+      });
+
+      window.addEventListener("pointerup", () => {
+        if (!arrastrando) return;
+        arrastrando = false;
+        if (movio) terminar();   // si no se movió, queda la primera letra esperando el segundo toque
+      });
+
+      // Teclado: Enter/Espacio sobre una letra funciona como un toque.
+      tablero.addEventListener("click", (e) => {
+        const el = e.target.closest(".letra");
+        if (!el || e.detail !== 0) return;
+        if (!inicio) { inicio = el; marcar(el); }
+        else if (inicio === el) { marcadas.forEach((x) => x.classList.remove("marcada")); marcadas = []; inicio = null; }
+        else { marcar(el); terminar(); }
+      });
+
+      function mostrarFinal() {
+        final.classList.add("visible");
+        final.setAttribute("aria-hidden", "false");
+        final.querySelector(".boton").focus({ preventScroll: true });
+      }
+
+      function cerrarFinal() {
+        final.classList.remove("visible");
+        final.setAttribute("aria-hidden", "true");
+      }
+
+      document.getElementById("ver-mensaje").addEventListener("click", (e) => { e.preventDefault(); mostrarFinal(); });
+      document.getElementById("cerrar").addEventListener("click", cerrarFinal);
+      final.addEventListener("click", (e) => { if (e.target === final) cerrarFinal(); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarFinal(); });
+    })();
+  </script>
+</body>
+</html>
